@@ -1,0 +1,319 @@
+/* Project Pulse: a readable, resilient dashboard surface. */
+:root {
+  color-scheme: light;
+  --page: #f4f7fb;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --ink: #172033;
+  --ink-muted: #536176;
+  --line: #d8e0eb;
+  --accent: #3159c8;
+  --accent-strong: #243f91;
+  --focus: #f59e0b;
+  --radius-card: 16px;
+  --radius-control: 999px;
+  --shadow-card: 0 4px 14px rgb(23 32 51 / 8%), 0 1px 2px rgb(23 32 51 / 6%);
+  --shadow-raised: 0 12px 28px rgb(23 32 51 / 13%), 0 2px 5px rgb(23 32 51 / 8%);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* The shell is deliberately constrained so scanning stays comfortable on wide screens. */
+.dashboard {
+  width: min(100% - 2rem, 1200px);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 4rem) 0 clamp(2.5rem, 6vw, 5rem);
+}
+
+.dashboard > header,
+.dashboard__header {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.dashboard h1,
+.dashboard__title {
+  max-width: 24ch;
+  margin: 0;
+  color: #101a30;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 780;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.dashboard > header p,
+.dashboard__subtitle {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: clamp(1rem, 2.4vw, 1.5rem);
+  align-items: stretch;
+}
+
+.project-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1.1rem, 2.5vw, 1.5rem);
+  overflow-wrap: anywhere;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.project-card:hover {
+  border-color: #b9c8e3;
+  box-shadow: var(--shadow-raised);
+  transform: translateY(-2px);
+}
+
+.project-card__header {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.project-card__header > :only-child {
+  flex: 1 1 auto;
+}
+
+.project-card__title {
+  min-width: 0;
+  margin: 0;
+  color: #152344;
+  font-size: 1.2rem;
+  font-weight: 750;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.project-card__owner {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.project-card__summary {
+  min-width: 0;
+  margin: 0;
+  color: #334155;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.project-card__meta {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.project-card__label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #5b687b;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Meta values remain readable when activity or owner strings are unexpectedly long. */
+.project-card__meta > * {
+  min-width: 0;
+  color: #273750;
+  overflow-wrap: anywhere;
+}
+
+.status-badge,
+.priority-badge {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-control);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  line-height: 1.25;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+/* Symbols and explicit badge text provide meaning independently of hue. */
+.status-badge::before {
+  flex: 0 0 auto;
+  font-size: 0.9em;
+  font-weight: 900;
+}
+
+.status-on-track {
+  color: #17653a;
+  background: #eaf8ef;
+}
+
+.status-on-track::before {
+  content: "✓";
+}
+
+.status-at-risk {
+  color: #8a4b00;
+  background: #fff4df;
+}
+
+.status-at-risk::before {
+  content: "!";
+}
+
+.status-blocked {
+  color: #a12626;
+  background: #ffebeb;
+}
+
+.status-blocked::before {
+  content: "×";
+}
+
+.priority-badge::before {
+  content: "Priority:";
+  font-weight: 650;
+}
+
+.priority-high {
+  color: #982d25;
+  background: #fff0ed;
+}
+
+.priority-medium {
+  color: #765000;
+  background: #fff7d9;
+}
+
+.priority-low {
+  color: #245c62;
+  background: #e9f8f8;
+}
+
+.state-message {
+  max-width: 68ch;
+  margin: clamp(1rem, 3vw, 2rem) auto;
+  padding: 1rem 1.125rem;
+  color: #334155;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  overflow-wrap: anywhere;
+}
+
+.state-message--error {
+  color: #7e2020;
+  background: #fff5f5;
+  border-color: #e7adad;
+}
+
+.state-message--error::before {
+  content: "Error: ";
+  font-weight: 800;
+}
+
+a {
+  color: var(--accent-strong);
+  text-underline-offset: 0.16em;
+}
+
+a:hover {
+  color: #172c70;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .dashboard {
+    width: min(100% - 1.25rem, 1200px);
+    padding-top: 1.25rem;
+  }
+
+  .project-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .project-card {
+    padding: 1rem;
+    border-radius: 13px;
+  }
+
+  .project-card:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .project-card,
+  .state-message,
+  .status-badge,
+  .priority-badge {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+}

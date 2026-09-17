@@ -1,0 +1,44 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding",
+      "owner": "Maya Chen",
+      "status": "On track",
+      "recentActivity": "Updated the first-contribution guide and reviewed three newcomer pull requests.",
+      "priority": "High",
+      "summary": "Make the first contribution path clear, welcoming, and easy to complete."
+    },
+    {
+      "name": "Accessibility Review",
+      "owner": "Jordan Patel",
+      "status": "At risk",
+      "recentActivity": "Keyboard navigation findings are ready; contrast fixes need volunteer review.",
+      "priority": "High",
+      "summary": "Resolve the remaining accessibility findings before the next community release."
+    },
+    {
+      "name": "Documentation Refresh",
+      "owner": "Elena Rodriguez",
+      "status": "On track",
+      "recentActivity": "Published the deployment walkthrough and opened issues for outdated screenshots.",
+      "priority": "Medium",
+      "summary": "Keep setup and deployment documentation accurate for contributors and maintainers."
+    },
+    {
+      "name": "Release Automation",
+      "owner": "Sam Okafor",
+      "status": "Blocked",
+      "recentActivity": "Waiting for repository-token permissions from the organization administrators.",
+      "priority": "Medium",
+      "summary": "Automate repeatable release checks so maintainers can ship with confidence."
+    },
+    {
+      "name": "Community Issue Triage",
+      "owner": "Priya Shah",
+      "status": "On track",
+      "recentActivity": "Labeled the latest incoming issues and paired two good-first-issues with mentors.",
+      "priority": "Low",
+      "summary": "Help contributors find well-scoped work and keep the issue queue actionable."
+    }
+  ]
+}

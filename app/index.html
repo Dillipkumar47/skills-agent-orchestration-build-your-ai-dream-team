@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header>
+      <h1>Project Pulse</h1>
+      <p>Active work and useful context for contributors.</p>
+    </header>
+
+    <section aria-labelledby="projects-heading">
+      <h2 id="projects-heading">Active projects</h2>
+      <div id="dashboard-state" class="state-message" role="status" aria-live="polite">
+        Loading projects…
+      </div>
+      <div id="project-grid" class="project-grid" aria-busy="true"></div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const projectGrid = document.getElementById("project-grid");
+      const stateMessage = document.getElementById("dashboard-state");
+      const supportedStatuses = {
+        "on track": "status-on-track",
+        "at risk": "status-at-risk",
+        "blocked": "status-blocked"
+      };
+      const supportedPriorities = {
+        "high": "priority-high",
+        "medium": "priority-medium",
+        "low": "priority-low"
+      };
+
+      function readableValue(value, fallback) {
+        return typeof value === "string" && value.trim() ? value.trim() : fallback;
+      }
+
+      function addDetail(container, labelText, valueText, className) {
+        const item = document.createElement("div");
+        const label = document.createElement("dt");
+        const value = document.createElement("dd");
+
+        label.className = "project-card__label";
+        label.textContent = labelText;
+        value.textContent = valueText;
+        if (className) {
+          value.classList.add(className);
+        }
+        item.append(label, value);
+        container.appendChild(item);
+      }
+
+      function createBadge(labelText, value, variants, baseClass) {
+        const badge = document.createElement("span");
+        const displayedValue = readableValue(value, "Not specified");
+        const normalizedValue = displayedValue.toLowerCase();
+
+        badge.classList.add(baseClass);
+        if (variants[normalizedValue]) {
+          badge.classList.add(variants[normalizedValue]);
+        }
+        badge.textContent = displayedValue;
+        badge.setAttribute("aria-label", labelText + ": " + displayedValue);
+        return badge;
+      }
+
+      function createProjectCard(project) {
+        const safeProject = project && typeof project === "object" && !Array.isArray(project)
+          ? project
+          : {};
+        const card = document.createElement("article");
+        const header = document.createElement("header");
+        const title = document.createElement("h3");
+        const owner = document.createElement("p");
+        const summary = document.createElement("p");
+        const meta = document.createElement("dl");
+        const statusItem = document.createElement("div");
+        const statusLabel = document.createElement("dt");
+        const statusValue = document.createElement("dd");
+        const priorityItem = document.createElement("div");
+        const priorityLabel = document.createElement("dt");
+        const priorityValue = document.createElement("dd");
+
+        card.className = "project-card";
+        header.className = "project-card__header";
+        title.className = "project-card__title";
+        owner.className = "project-card__owner";
+        summary.className = "project-card__summary";
+        meta.className = "project-card__meta";
+
+        title.textContent = readableValue(safeProject.name, "Untitled project");
+        owner.textContent = "Owner: " + readableValue(safeProject.owner, "Unassigned");
+        summary.textContent = readableValue(
+          safeProject.summary,
+          "No contributor summary is available for this project."
+        );
+
+        statusLabel.className = "project-card__label";
+        statusLabel.textContent = "Status";
+        statusValue.appendChild(
+          createBadge("Status", safeProject.status, supportedStatuses, "status-badge")
+        );
+        statusItem.append(statusLabel, statusValue);
+
+        priorityLabel.className = "project-card__label";
+        priorityLabel.textContent = "Priority";
+        priorityValue.appendChild(
+          createBadge("Priority", safeProject.priority, supportedPriorities, "priority-badge")
+        );
+        priorityItem.append(priorityLabel, priorityValue);
+
+        meta.append(statusItem, priorityItem);
+        addDetail(
+          meta,
+          "Recent activity",
+          readableValue(safeProject.recentActivity, "No recent activity has been provided.")
+        );
+        header.append(title, owner);
+        card.append(header, summary, meta);
+        return card;
+      }
+
+      function showState(message, isError) {
+        stateMessage.textContent = message;
+        stateMessage.hidden = false;
+        stateMessage.className = isError
+          ? "state-message state-message--error"
+          : "state-message";
+        stateMessage.setAttribute("role", isError ? "alert" : "status");
+      }
+
+      function renderProjects(projects) {
+        projectGrid.replaceChildren();
+        if (projects.length === 0) {
+          showState("There are no active projects to show yet. Please check back soon.", false);
+          return;
+        }
+
+        const cards = document.createDocumentFragment();
+        projects.forEach((project) => cards.appendChild(createProjectCard(project)));
+        projectGrid.appendChild(cards);
+        stateMessage.hidden = true;
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("project-data.json", { credentials: "same-origin" });
+          if (!response.ok) {
+            throw new Error("The project data request returned HTTP " + response.status + ".");
+          }
+
+          const data = await response.json();
+          if (!data || typeof data !== "object" || Array.isArray(data) || !Array.isArray(data.projects)) {
+            throw new Error("Project data must be an object containing a projects array.");
+          }
+
+          renderProjects(data.projects);
+        } catch (error) {
+          projectGrid.replaceChildren();
+          const detail = error instanceof Error ? error.message : "An unexpected error occurred.";
+          showState(
+            "Unable to load project data. Start the dashboard with the local launch configuration and try again. " +
+              detail,
+            true
+          );
+        } finally {
+          projectGrid.setAttribute("aria-busy", "false");
+        }
+      }
+
+      loadProjects();
+    })();
+  </script>
+</body>
+</html>
